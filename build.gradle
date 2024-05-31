@@ -43,6 +43,10 @@ dependencies {
 	// Testing Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.mockito:mockito-core'
+	testImplementation 'org.mockito:mockito-junit-jupiter'
+
+
 }
 
 tasks.named('test') {
