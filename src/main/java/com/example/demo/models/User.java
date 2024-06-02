@@ -1,5 +1,6 @@
 package com.example.demo.models;
 
+import com.example.demo.config.DomainObject;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class User extends DomainObject {
 
     @Id
     @Column(name = "id", nullable = false)
