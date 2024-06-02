@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,5 +39,11 @@ public class UserController {
     public ResponseEntity<User> getByEmail(@PathVariable String email) {
         User getUser = userService.getByEmail(email);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<User>> getAll() {
+        List users = userService.findAll();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

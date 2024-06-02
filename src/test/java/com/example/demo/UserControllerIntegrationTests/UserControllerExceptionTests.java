@@ -14,6 +14,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +79,7 @@ public class UserControllerExceptionTests {
     @Test
     public void testGetUserByEmailNotFound() {
         User user = createUser();
-        Mockito.when(userService.getByEmail(user.getEmail())).thenThrow(new CustomExceptions.UserNotFoundException("User not found with email: " + user.getUsername()));
+        Mockito.when(userService.getByEmail(user.getEmail())).thenThrow(new CustomExceptions.UserNotFoundException("User not found with email: " + user.getEmail()));
 
         String url = String.format("/api/users/getByEmail/%s", user.getEmail());
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = restTemplate.getForEntity(url, GlobalExceptionHandler.ErrorResponse.class);

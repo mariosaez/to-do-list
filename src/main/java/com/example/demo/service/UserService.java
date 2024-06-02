@@ -6,6 +6,7 @@ import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,5 +32,9 @@ public class UserService {
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with email: " + email));
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

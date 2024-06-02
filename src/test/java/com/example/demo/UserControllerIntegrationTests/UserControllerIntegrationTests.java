@@ -13,6 +13,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,12 +44,6 @@ class UserControllerIntegrationTests {
 		return user;
 	}
 
-	private User createUser() {
-		User user = getUser();
-		Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(user);
-		return user;
-	}
-
 	@Test
 	public void testRegisterUser() {
 		User user = getUser();
@@ -65,7 +61,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetByIdUser() {
-		User user = createUser();
+		User user = getUser();
 		Mockito.when(userService.getById(Mockito.any(UUID.class))).thenReturn(user);
 
 		String url = String.format("/api/users/getById/%s", user.getId());
@@ -81,7 +77,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetByUsername() {
-		User user = createUser();
+		User user = getUser();
 		Mockito.when(userService.getByUsername(Mockito.any(String.class))).thenReturn(user);
 
 		String url = String.format("/api/users/getByUsername/%s", user.getUsername());
@@ -97,7 +93,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetUserByEmail() {
-		User user = createUser();
+		User user = getUser();
 		Mockito.when(userService.getByEmail(user.getEmail())).thenReturn(user);
 
 		String url = String.format("/api/users/getByEmail/%s", user.getEmail());
@@ -108,5 +104,21 @@ class UserControllerIntegrationTests {
 		assertThat(response.getBody().getEmail()).isEqualTo(user.getEmail());
 		assertThat(response.getBody().getPassword()).isEqualTo(user.getPassword());
 		assertThat(response.getBody().getId()).isEqualTo(user.getId());
+	}
+
+	@Test
+	public void testGetAllUsers() {
+		List<User> userList = new ArrayList<>();
+
+		for (int i = 0; i < 5; i++) {
+			userList.add(getUser());
+		}
+		Mockito.when(userService.findAll()).thenReturn(userList);
+
+		ResponseEntity<List> response = restTemplate.getForEntity("/api/users/getAll", List.class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().size()).isEqualTo(5);
 	}
 }
