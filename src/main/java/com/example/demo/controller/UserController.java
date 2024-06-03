@@ -2,10 +2,16 @@ package com.example.demo.controller;
 
 import com.example.demo.models.User;
 import com.example.demo.service.UserService;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import org.hibernate.annotations.Parameter;
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,4 +52,15 @@ public class UserController {
         List users = userService.findAll();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    @GetMapping("/getAllPaginated")
+    public ResponseEntity<Page<User>> getAllPaginated(
+            @RequestParam() int page,
+            @RequestParam() int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userService.findAllPaginated(pageable);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
 }

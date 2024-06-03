@@ -121,4 +121,9 @@ class UserControllerIntegrationTests {
 		assertThat(response.getBody()).isNotNull();
 		assertThat(response.getBody().size()).isEqualTo(5);
 	}
+
+	@Test
+	public void testGetAllUsersPaginated() {
+
+	}
 }

@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +103,38 @@ public class UserServiceTests {
 
         assertNotNull(foundUsers);
         assertEquals(foundUsers.size(), 5);
+    }
+
+    @Test
+    public void testGetAllPaginated() {
+        List<User> userList = new ArrayList<>();
+        for (int i = 0; i <= 4; i++) {
+            userList.add(getUser());
+        }
+        Pageable pageable = PageRequest.of(0, 100);
+        Page<User> usersResult = new PageImpl<>(userList, pageable, userList.size());
+
+        when(userRepository.findAll(pageable)).thenReturn(usersResult);
+
+        Page<User> users = userService.findAllPaginated(pageable);
+
+        assertNotNull(users);
+        assertEquals(users.getContent().size(), 5);
+    }
+
+    @Test
+    public void testGetAllPaginatedEmptyReturnEmptyPage() {
+        List<User> userList = new ArrayList<>();
+
+        Pageable pageable = PageRequest.of(0, 100);
+        Page<User> usersResult = new PageImpl<>(userList, pageable, userList.size());
+
+        when(userRepository.findAll(pageable)).thenReturn(usersResult);
+
+        Page<User> users = userService.findAllPaginated(pageable);
+
+        assertNotNull(users);
+        assertEquals(users.getContent().size(), 0);
     }
 }
 
