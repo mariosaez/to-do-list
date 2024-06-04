@@ -136,6 +136,23 @@ public class UserServiceTests {
         assertNotNull(users);
         assertEquals(users.getContent().size(), 0);
     }
+
+    @Test
+    public void testUpdateUser() {
+        User user = getUser();
+        user.setEmail("nuevo@gmail.com");
+        user.setUsername("newUsername");
+
+        when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        User response = userService.updateUser(user);
+
+        assertNotNull(response);
+        assertEquals(response.getUsername(), user.getUsername());
+        assertEquals(response.getEmail(), user.getEmail());
+        assertEquals(response.getId(), user.getId());
+    }
 }
 
 

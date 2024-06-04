@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public User saveUser(User user) {
         return userRepository.save(user);
     }
@@ -42,5 +45,20 @@ public class UserService {
 
     public Page<User> findAllPaginated(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    @Transactional
+    public User updateUser(User user) {
+        User userFound = getById(user.getId());
+        return userRepository.save(userFound);
+    }
+
+    @Transactional
+    public List<User> updateUserList(List<User> usersToUpdate) {
+        List<User> updatedUsers = new ArrayList<>();
+        usersToUpdate.forEach(user ->
+                updatedUsers.add(updateUser(user))
+        );
+        return updatedUsers;
     }
 }

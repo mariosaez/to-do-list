@@ -68,4 +68,13 @@ public class UserServiceExceptionTests {
             userService.getByEmail("falseMail@gmail.com");
         });
     }
+
+    @Test
+    public void testUpdateUserNotFound() {
+        User user = new User();
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+        assertThrows(CustomExceptions.UserNotFoundException.class, () -> {
+            userService.updateUser(user);
+        });
+    }
 }

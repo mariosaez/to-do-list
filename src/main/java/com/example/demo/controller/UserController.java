@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.config.PagedResponse;
 import com.example.demo.models.User;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -54,13 +55,30 @@ public class UserController {
     }
 
     @GetMapping("/getAllPaginated")
-    public ResponseEntity<Page<User>> getAllPaginated(
+    public ResponseEntity<PagedResponse<User>> getAllPaginated(
             @RequestParam() int page,
             @RequestParam() int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<User> users = userService.findAllPaginated(pageable);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        PagedResponse<User> response = new PagedResponse<>(users);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/updateUser")
+    public ResponseEntity<User> updateUser(
+            @RequestBody User userToUpdate
+    ) {
+        User user = userService.updateUser(userToUpdate);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PutMapping("/updateUserList")
+    public ResponseEntity<List> updateUserList(
+            @RequestBody List<User> usersToUpdate
+    ) {
+        List<User> userUpdated = userService.updateUserList(usersToUpdate);
+        return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
 }

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -87,5 +89,20 @@ public class UserControllerExceptionTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getMessage()).isEqualTo("User not found with email: " + user.getEmail());
+    }
+
+    @Test
+    public void testUpdateUserNotFound() {
+        User user = createUser();
+        Mockito.when(userService.updateUser(user)).thenThrow(new CustomExceptions.UserNotFoundException("User not found with id: " + user.getId()));
+
+        String url = String.format("/api/users/updateUser", user);
+        HttpEntity<User> request = new HttpEntity<>(user);
+
+        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = restTemplate.exchange(url, HttpMethod.PUT, request, GlobalExceptionHandler.ErrorResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("User not found with id: " + user.getId());
     }
 }
