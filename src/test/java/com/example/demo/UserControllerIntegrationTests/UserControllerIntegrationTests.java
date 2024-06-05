@@ -22,6 +22,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,9 @@ class UserControllerIntegrationTests {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private WebTestClient webTestClient;
 
 	@MockBean
 	private UserService userService;
@@ -207,13 +211,13 @@ class UserControllerIntegrationTests {
 		User user = getUser();
 		Mockito.when(userService.deleteUser(user.getId())).thenReturn(user);
 
-		HttpEntity<UUID> request = new HttpEntity<>(user.getId());
-
-		ResponseEntity<User> response = restTemplate.exchange("api/users/deleteUser", HttpMethod.DELETE, request, User.class);
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals(user, response.getBody());
+		webTestClient.method(HttpMethod.DELETE)
+				.uri("/api/users/deleteUser")
+				.bodyValue(user.getId())
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(User.class)
+				.isEqualTo(user);
 
 		verify(userService).deleteUser(user.getId());
 	}
