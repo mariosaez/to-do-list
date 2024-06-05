@@ -81,4 +81,12 @@ public class UserController {
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
+    @DeleteMapping("deleteUser")
+    public ResponseEntity<User> deleteUser(
+            @RequestBody UUID id
+    ) {
+        User user = userService.deleteUser(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
 }

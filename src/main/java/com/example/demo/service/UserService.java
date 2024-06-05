@@ -61,4 +61,11 @@ public class UserService {
         );
         return updatedUsers;
     }
+
+    @Transactional
+    public User deleteUser(UUID id) {
+        User userToDelete = userRepository.getById(id);
+        userRepository.deleteById(userToDelete.getId());
+        return userToDelete;
+    }
 }

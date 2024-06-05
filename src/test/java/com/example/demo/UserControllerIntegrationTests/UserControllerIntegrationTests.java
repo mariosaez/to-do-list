@@ -30,6 +30,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -199,5 +200,21 @@ class UserControllerIntegrationTests {
 		assertNotNull(response);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertEquals(response.getBody().get(0), user);
+	}
+
+	@Test
+	public void testDeleteUser() {
+		User user = getUser();
+		Mockito.when(userService.deleteUser(user.getId())).thenReturn(user);
+
+		HttpEntity<UUID> request = new HttpEntity<>(user.getId());
+
+		ResponseEntity<User> response = restTemplate.exchange("api/users/deleteUser", HttpMethod.DELETE, request, User.class);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertEquals(user, response.getBody());
+
+		verify(userService).deleteUser(user.getId());
 	}
 }

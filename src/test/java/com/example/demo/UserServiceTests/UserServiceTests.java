@@ -22,7 +22,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class UserServiceTests {
 
@@ -152,6 +152,17 @@ public class UserServiceTests {
         assertEquals(response.getUsername(), user.getUsername());
         assertEquals(response.getEmail(), user.getEmail());
         assertEquals(response.getId(), user.getId());
+    }
+
+    @Test
+    public void testDeleteUser() {
+        User user = getUser();
+        when(userRepository.getById(user.getId())).thenReturn(user);
+        doNothing().when(userRepository).deleteById(user.getId());
+
+        userService.deleteUser(user.getId());
+
+        verify(userRepository).deleteById(user.getId());
     }
 }
 
