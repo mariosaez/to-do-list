@@ -3,6 +3,7 @@ package com.example.demo.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.DataOutput;
 import java.util.UUID;
 
 @Entity
@@ -17,13 +18,14 @@ public class Task {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private String description;
+    @Column
+    private String content;
 
     @Column(nullable = false)
-    private boolean completed = false;
+    private State state = State.CREATED;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 }
+
