@@ -1,6 +1,8 @@
 package com.example.demo.UserServiceTests;
 
+import com.example.demo.models.Task;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.service.UserService;
 import com.github.javafaker.Faker;
@@ -48,12 +50,25 @@ public class UserServiceTests {
         return user;
     }
 
+    private Task getTask() {
+        Task task = new Task();
+        task.setId(UUID.randomUUID());
+        task.setTitle("task 1");
+        return task;
+    }
+
     @Test
     public void testGetByIdUser() {
         User user = getUser();
+        Task task = getTask();
+        ArrayList<Task> taskList = new ArrayList<>();
+        taskList.add(task);
+        task.setUser(user);
+        user.setTasks(taskList);
+        
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
 
-        User foundUser = userService.getById(user.getId());
+        UserDTO foundUser = userService.getById(user.getId());
 
         assertNotNull(foundUser);
         assertEquals(user.getId(), foundUser.getId());
@@ -67,7 +82,7 @@ public class UserServiceTests {
         User user = getUser();
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
-        User foundUser = userService.getByUsername(user.getUsername());
+        UserDTO foundUser = userService.getByUsername(user.getUsername());
 
         assertNotNull(foundUser);
         assertEquals(user.getId(), foundUser.getId());
@@ -81,7 +96,7 @@ public class UserServiceTests {
         User user = getUser();
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        User foundUser = userService.getByEmail(user.getEmail());
+        UserDTO foundUser = userService.getByEmail(user.getEmail());
 
         assertNotNull(foundUser);
         assertEquals(user.getId(), foundUser.getId());
@@ -116,7 +131,7 @@ public class UserServiceTests {
 
         when(userRepository.findAll(pageable)).thenReturn(usersResult);
 
-        Page<User> users = userService.findAllPaginated(pageable);
+        Page<UserDTO> users = userService.findAllPaginated(pageable);
 
         assertNotNull(users);
         assertEquals(users.getContent().size(), 5);
@@ -131,7 +146,7 @@ public class UserServiceTests {
 
         when(userRepository.findAll(pageable)).thenReturn(usersResult);
 
-        Page<User> users = userService.findAllPaginated(pageable);
+        Page<UserDTO> users = userService.findAllPaginated(pageable);
 
         assertNotNull(users);
         assertEquals(users.getContent().size(), 0);
@@ -146,7 +161,7 @@ public class UserServiceTests {
         when(userRepository.save(user)).thenReturn(user);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        User response = userService.updateUser(user);
+        UserDTO response = userService.updateUser(user);
 
         assertNotNull(response);
         assertEquals(response.getUsername(), user.getUsername());

@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.Utils.CustomExceptions;
+import com.example.demo.Utils.DataMapper;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,60 +14,80 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DataMapper dataMapper;
 
     @Transactional
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public UserDTO saveUser(User user) {
+        UserDTO userDTO = dataMapper.toDTO(userRepository.save(user));
+        return userDTO;
     }
 
-    public User getById(UUID id) {
-        return userRepository.findById(id)
+    @Transactional
+    public UserDTO getById(UUID id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with id: " + id));
+        UserDTO userDTO = dataMapper.toDTO(user);
+        return userDTO;
     }
 
-    public User getByUsername(String username) {
-        return userRepository.findByUsername(username)
+    public UserDTO getByUsername(String username) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with username: " + username));
+        UserDTO userDTO = dataMapper.toDTO(user);
+        return userDTO;
     }
 
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email)
+    public UserDTO getByEmail(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with email: " + email));
+        UserDTO userDTO = dataMapper.toDTO(user);
+        return userDTO;
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDTO> findAll() {
+        List<User> userList = userRepository.findAll();
+        List<UserDTO> userDTOList = userList.stream()
+                .map(dataMapper::toDTO)
+                .collect(Collectors.toList());
+        return userDTOList;
     }
 
-    public Page<User> findAllPaginated(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserDTO> findAllPaginated(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        Page<UserDTO> userDTOPage = userPage.map(dataMapper::toDTO);
+        return userDTOPage;
+
     }
 
     @Transactional
-    public User updateUser(User user) {
-        User userFound = getById(user.getId());
-        return userRepository.save(userFound);
+    public UserDTO updateUser(User user) {
+        User result = userRepository.save(dataMapper.fromDTO(getById(user.getId())));
+        UserDTO userDTO = dataMapper.toDTO(result);
+        return userDTO;
     }
 
     @Transactional
-    public List<User> updateUserList(List<User> usersToUpdate) {
-        List<User> updatedUsers = new ArrayList<>();
+    public List<UserDTO> updateUserList(List<User> usersToUpdate) {
+        List<UserDTO> updatedUsersDTO = new ArrayList<>();
         usersToUpdate.forEach(user ->
-                updatedUsers.add(updateUser(user))
+                updatedUsersDTO.add(updateUser(user))
         );
-        return updatedUsers;
+        return updatedUsersDTO;
     }
 
     @Transactional
-    public User deleteUser(UUID id) {
+    public UserDTO deleteUser(UUID id) {
         User userToDelete = userRepository.getById(id);
         userRepository.deleteById(userToDelete.getId());
-        return userToDelete;
+        UserDTO userDTO = dataMapper.toDTO(userToDelete);
+        return userDTO;
     }
 }

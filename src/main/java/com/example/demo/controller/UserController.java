@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.config.PagedResponse;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.hibernate.annotations.Parameter;
@@ -25,51 +26,51 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
+    public ResponseEntity<UserDTO> registerUser(@RequestBody User user) {
+        UserDTO savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
     @GetMapping("/getById/{id}")
-    public ResponseEntity<User> getById(@PathVariable UUID id) {
-        User getUser = userService.getById(id);
+    public ResponseEntity<UserDTO> getById(@PathVariable UUID id) {
+        UserDTO getUser = userService.getById(id);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
     }
 
     @GetMapping("/getByUsername/{username}")
-    public ResponseEntity<User> getByusername(@PathVariable String username) {
-        User getUser = userService.getByUsername(username);
+    public ResponseEntity<UserDTO> getByusername(@PathVariable String username) {
+        UserDTO getUser = userService.getByUsername(username);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
     }
 
     @GetMapping("/getByEmail/{email}")
-    public ResponseEntity<User> getByEmail(@PathVariable String email) {
-        User getUser = userService.getByEmail(email);
+    public ResponseEntity<UserDTO> getByEmail(@PathVariable String email) {
+        UserDTO getUser = userService.getByEmail(email);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<UserDTO>> getAll() {
         List users = userService.findAll();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/getAllPaginated")
-    public ResponseEntity<PagedResponse<User>> getAllPaginated(
+    public ResponseEntity<PagedResponse<UserDTO>> getAllPaginated(
             @RequestParam() int page,
             @RequestParam() int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> users = userService.findAllPaginated(pageable);
-        PagedResponse<User> response = new PagedResponse<>(users);
+        Page<UserDTO> users = userService.findAllPaginated(pageable);
+        PagedResponse<UserDTO> response = new PagedResponse<>(users);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/updateUser")
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserDTO> updateUser(
             @RequestBody User userToUpdate
     ) {
-        User user = userService.updateUser(userToUpdate);
+        UserDTO user = userService.updateUser(userToUpdate);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -77,15 +78,15 @@ public class UserController {
     public ResponseEntity<List> updateUserList(
             @RequestBody List<User> usersToUpdate
     ) {
-        List<User> userUpdated = userService.updateUserList(usersToUpdate);
+        List<UserDTO> userUpdated = userService.updateUserList(usersToUpdate);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
     @DeleteMapping("deleteUser")
-    public ResponseEntity<User> deleteUser(
+    public ResponseEntity<UserDTO> deleteUser(
             @RequestBody UUID id
     ) {
-        User user = userService.deleteUser(id);
+        UserDTO user = userService.deleteUser(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
