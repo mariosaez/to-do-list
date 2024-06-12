@@ -25,8 +25,8 @@ public class UserService {
     private DataMapper dataMapper;
 
     @Transactional
-    public UserDTO saveUser(User user) {
-        UserDTO userDTO = dataMapper.toDTO(userRepository.save(user));
+    public UserDTO saveUser(UserDTO user) {
+        UserDTO userDTO = dataMapper.toDTO(userRepository.save(dataMapper.fromDTO(user)));
         return userDTO;
     }
 
@@ -68,14 +68,15 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO updateUser(User user) {
-        User result = userRepository.save(dataMapper.fromDTO(getById(user.getId())));
+    public UserDTO updateUser(UserDTO user) {
+        User userToUpdate = dataMapper.fromDTO(user);
+        User result = userRepository.save(userToUpdate);
         UserDTO userDTO = dataMapper.toDTO(result);
         return userDTO;
     }
 
     @Transactional
-    public List<UserDTO> updateUserList(List<User> usersToUpdate) {
+    public List<UserDTO> updateUserList(List<UserDTO> usersToUpdate) {
         List<UserDTO> updatedUsersDTO = new ArrayList<>();
         usersToUpdate.forEach(user ->
                 updatedUsersDTO.add(updateUser(user))

@@ -26,7 +26,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody User user) {
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO user) {
         UserDTO savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
@@ -68,7 +68,7 @@ public class UserController {
 
     @PutMapping("/updateUser")
     public ResponseEntity<UserDTO> updateUser(
-            @RequestBody User userToUpdate
+            @RequestBody UserDTO userToUpdate
     ) {
         UserDTO user = userService.updateUser(userToUpdate);
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -76,7 +76,7 @@ public class UserController {
 
     @PutMapping("/updateUserList")
     public ResponseEntity<List> updateUserList(
-            @RequestBody List<User> usersToUpdate
+            @RequestBody List<UserDTO> usersToUpdate
     ) {
         List<UserDTO> userUpdated = userService.updateUserList(usersToUpdate);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);

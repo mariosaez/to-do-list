@@ -2,6 +2,7 @@ package com.example.demo.UserServiceTests;
 
 import com.example.demo.Utils.CustomExceptions;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.service.UserService;
 import com.github.javafaker.Faker;
@@ -71,7 +72,7 @@ public class UserServiceExceptionTests {
 
     @Test
     public void testUpdateUserNotFound() {
-        User user = new User();
+        UserDTO user = new UserDTO();
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
         assertThrows(CustomExceptions.UserNotFoundException.class, () -> {
             userService.updateUser(user);

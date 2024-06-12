@@ -2,7 +2,7 @@ package com.example.demo.UserControllerIntegrationTests;
 
 import com.example.demo.Utils.CustomExceptions;
 import com.example.demo.Utils.GlobalExceptionHandler;
-import com.example.demo.models.User;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.service.UserService;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ public class UserControllerExceptionTests {
 
     private Faker faker = new Faker();
 
-    private User getUser() {
-        User user = new User();
+    private UserDTO getUser() {
+        UserDTO user = new UserDTO();
         user.setUsername(faker.name().username());
         user.setPassword(faker.internet().password());
         user.setId(UUID.randomUUID());
@@ -43,9 +43,9 @@ public class UserControllerExceptionTests {
         return user;
     }
 
-    private User createUser() {
-        User user = getUser();
-        Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(user);
+    private UserDTO createUser() {
+        UserDTO user = getUser();
+        Mockito.when(userService.saveUser(Mockito.any(UserDTO.class))).thenReturn(user);
         return user;
     }
 
@@ -77,7 +77,7 @@ public class UserControllerExceptionTests {
 
     @Test
     public void testGetUserByEmailNotFound() {
-        User user = createUser();
+        UserDTO user = createUser();
         Mockito.when(userService.getByEmail(user.getEmail())).thenThrow(new CustomExceptions.UserNotFoundException("User not found with email: " + user.getEmail()));
 
         String url = String.format("/api/users/getByEmail/%s", user.getEmail());
@@ -90,11 +90,11 @@ public class UserControllerExceptionTests {
 
     @Test
     public void testUpdateUserNotFound() {
-        User user = createUser();
+        UserDTO user = createUser();
         Mockito.when(userService.updateUser(user)).thenThrow(new CustomExceptions.UserNotFoundException("User not found with id: " + user.getId()));
 
         String url = String.format("/api/users/updateUser", user);
-        HttpEntity<User> request = new HttpEntity<>(user);
+        HttpEntity<UserDTO> request = new HttpEntity<>(user);
 
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = restTemplate.exchange(url, HttpMethod.PUT, request, GlobalExceptionHandler.ErrorResponse.class);
 

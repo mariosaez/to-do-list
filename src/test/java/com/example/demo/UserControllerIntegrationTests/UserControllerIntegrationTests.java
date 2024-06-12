@@ -3,11 +3,11 @@ package com.example.demo.UserControllerIntegrationTests;
 
 import com.example.demo.config.PagedResponse;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 
@@ -55,8 +56,8 @@ class UserControllerIntegrationTests {
 
 	private Faker faker = new Faker();
 
-	private User getUser() {
-		User user = new User();
+	private UserDTO getUser() {
+		UserDTO user = new UserDTO();
 		user.setUsername(faker.name().username());
 		user.setPassword(faker.internet().password());
 		user.setId(UUID.randomUUID());
@@ -66,8 +67,8 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testRegisterUser() {
-		User user = getUser();
-		Mockito.when(userService.saveUser(Mockito.any(User.class))).thenReturn(user);
+		UserDTO user = getUser();
+		Mockito.when(userService.saveUser(Mockito.any(UserDTO.class))).thenReturn(user);
 
 		ResponseEntity<User> response = restTemplate.postForEntity("/api/users/register", user, User.class);
 
@@ -81,7 +82,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetByIdUser() {
-		User user = getUser();
+		UserDTO user = getUser();
 		Mockito.when(userService.getById(Mockito.any(UUID.class))).thenReturn(user);
 
 		String url = String.format("/api/users/getById/%s", user.getId());
@@ -97,7 +98,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetByUsername() {
-		User user = getUser();
+		UserDTO user = getUser();
 		Mockito.when(userService.getByUsername(Mockito.any(String.class))).thenReturn(user);
 
 		String url = String.format("/api/users/getByUsername/%s", user.getUsername());
@@ -113,7 +114,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetUserByEmail() {
-		User user = getUser();
+		UserDTO user = getUser();
 		Mockito.when(userService.getByEmail(user.getEmail())).thenReturn(user);
 
 		String url = String.format("/api/users/getByEmail/%s", user.getEmail());
@@ -128,7 +129,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testGetAllUsers() {
-		List<User> userList = new ArrayList<>();
+		List<UserDTO> userList = new ArrayList<>();
 
 		for (int i = 0; i < 5; i++) {
 			userList.add(getUser());
@@ -145,9 +146,9 @@ class UserControllerIntegrationTests {
 	@Test
 	public void testGetAllUsersPaginated() {
 		Pageable pageable = PageRequest.of(0,100);
-		List<User> userList = new ArrayList<>();
+		List<UserDTO> userList = new ArrayList<>();
 		userList.add(getUser());
-		Page<User> usersResult = new PageImpl<>(userList, pageable, userList.size());
+		Page<UserDTO> usersResult = new PageImpl<>(userList, pageable, userList.size());
 		Mockito.when(userService.findAllPaginated(pageable)).thenReturn(usersResult);
 
 		ResponseEntity<PagedResponse> response = restTemplate.exchange(
@@ -164,16 +165,16 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testUpdateUser() {
-		User user = getUser();
-		Mockito.when(userService.updateUser(user)).thenReturn(user);
+		UserDTO user = getUser();
+		Mockito.when(userService.updateUser(any())).thenReturn(user);
 
 		user.setEmail("nuevo@gmail.com");
 		user.setUsername("newUsername");
 
 		String url = String.format("/api/users/updateUser", user);
-		HttpEntity<User> request = new HttpEntity<>(user);
+		HttpEntity<UserDTO> request = new HttpEntity<>(user);
 
-		ResponseEntity<User> response = restTemplate.exchange(url, HttpMethod.PUT, request, User.class);
+		ResponseEntity<UserDTO> response = restTemplate.exchange(url, HttpMethod.PUT, request, UserDTO.class);
 
 		assertNotNull(response);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -183,10 +184,10 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testUpdateUsersList() {
-		List<User> userList = new ArrayList<>();
-		User user = getUser();
+		List<UserDTO> userList = new ArrayList<>();
+		UserDTO user = getUser();
 		userList.add(user);
-		Mockito.when(userService.updateUserList(userList)).thenReturn(userList);
+		Mockito.when(userService.updateUserList(any())).thenReturn(userList);
 
 		user.setEmail("nuevo@gmail.com");
 		user.setUsername("newUsername");
@@ -208,7 +209,7 @@ class UserControllerIntegrationTests {
 
 	@Test
 	public void testDeleteUser() {
-		User user = getUser();
+		UserDTO user = getUser();
 		Mockito.when(userService.deleteUser(user.getId())).thenReturn(user);
 
 		webTestClient.method(HttpMethod.DELETE)
@@ -216,7 +217,7 @@ class UserControllerIntegrationTests {
 				.bodyValue(user.getId())
 				.exchange()
 				.expectStatus().isOk()
-				.expectBody(User.class)
+				.expectBody(UserDTO.class)
 				.isEqualTo(user);
 
 		verify(userService).deleteUser(user.getId());

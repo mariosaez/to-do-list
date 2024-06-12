@@ -3,7 +3,6 @@ package com.example.demo.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.io.DataOutput;
 import java.util.UUID;
 
 @Entity

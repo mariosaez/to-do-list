@@ -1,16 +1,22 @@
 package com.example.demo.UserServiceTests;
 
+import com.example.demo.Utils.DataMapper;
 import com.example.demo.models.Task;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.service.UserService;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +26,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class UserServiceTests {
 
     @Mock
@@ -34,6 +43,9 @@ public class UserServiceTests {
     @InjectMocks
     private UserService userService;
 
+    @Mock
+    private DataMapper dataMapper;
+
     private Faker faker = new Faker();
 
     @BeforeEach
@@ -41,8 +53,8 @@ public class UserServiceTests {
         MockitoAnnotations.openMocks(this);
     }
 
-    private User getUser() {
-        User user = new User();
+    private UserDTO getUser() {
+        UserDTO user = new UserDTO();
         user.setUsername(faker.name().username());
         user.setPassword(faker.internet().password());
         user.setId(UUID.randomUUID());
@@ -50,8 +62,8 @@ public class UserServiceTests {
         return user;
     }
 
-    private Task getTask() {
-        Task task = new Task();
+    private TaskDTO getTask() {
+        TaskDTO task = new TaskDTO();
         task.setId(UUID.randomUUID());
         task.setTitle("task 1");
         return task;
@@ -59,14 +71,21 @@ public class UserServiceTests {
 
     @Test
     public void testGetByIdUser() {
-        User user = getUser();
-        Task task = getTask();
-        ArrayList<Task> taskList = new ArrayList<>();
+        UserDTO user = getUser();
+        TaskDTO task = getTask();
+        ArrayList<TaskDTO> taskList = new ArrayList<>();
         taskList.add(task);
-        task.setUser(user);
+        task.setUserId(user.getId());
         user.setTasks(taskList);
+
+        User newUser = new User();
+        user.setId(user.getId());
+        user.setUsername(user.getUsername());
+        user.setEmail(user.getEmail());
+        user.setPassword(user.getPassword());
         
-        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(newUser));
+        when(dataMapper.toDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getById(user.getId());
 
@@ -79,8 +98,16 @@ public class UserServiceTests {
 
     @Test
     public void testGetByUsernameUser() {
-        User user = getUser();
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        UserDTO user = getUser();
+
+        User newUser = new User();
+        user.setId(user.getId());
+        user.setUsername(user.getUsername());
+        user.setEmail(user.getEmail());
+        user.setPassword(user.getPassword());
+
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(newUser));
+        when(dataMapper.toDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getByUsername(user.getUsername());
 
@@ -93,8 +120,15 @@ public class UserServiceTests {
 
     @Test
     public void testGetByEmailUser() {
-        User user = getUser();
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        UserDTO user = getUser();
+
+        User newUser = new User();
+        user.setId(user.getId());
+        user.setUsername(user.getUsername());
+        user.setEmail(user.getEmail());
+        user.setPassword(user.getPassword());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(newUser));
+        when(dataMapper.toDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getByEmail(user.getEmail());
 
@@ -107,12 +141,16 @@ public class UserServiceTests {
 
     @Test
     public void testGetAllUsers() {
-        List<User> userList = new ArrayList<>();
+        List<UserDTO> userList = new ArrayList<>();
 
         for (int i = 0; i <= 4; i++) {
             userList.add(getUser());
         }
-        when(userRepository.findAll()).thenReturn(userList);
+        List<User> newUserList = userList.stream()
+                        .map(dataMapper::fromDTO)
+                                .collect(Collectors.toList());
+
+        when(userRepository.findAll()).thenReturn(newUserList);
 
         List foundUsers = userService.findAll();
 
@@ -122,14 +160,16 @@ public class UserServiceTests {
 
     @Test
     public void testGetAllPaginated() {
-        List<User> userList = new ArrayList<>();
+        List<UserDTO> userList = new ArrayList<>();
         for (int i = 0; i <= 4; i++) {
             userList.add(getUser());
         }
         Pageable pageable = PageRequest.of(0, 100);
-        Page<User> usersResult = new PageImpl<>(userList, pageable, userList.size());
+        Page<UserDTO> usersResult = new PageImpl<>(userList, pageable, userList.size());
 
-        when(userRepository.findAll(pageable)).thenReturn(usersResult);
+        Page<User> userPageToFind = usersResult.map(dataMapper::fromDTO);
+
+        when(userRepository.findAll(pageable)).thenReturn(userPageToFind);
 
         Page<UserDTO> users = userService.findAllPaginated(pageable);
 
@@ -154,12 +194,14 @@ public class UserServiceTests {
 
     @Test
     public void testUpdateUser() {
-        User user = getUser();
+        UserDTO user = getUser();
         user.setEmail("nuevo@gmail.com");
         user.setUsername("newUsername");
 
-        when(userRepository.save(user)).thenReturn(user);
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        User newUser = dataMapper.fromDTO(user);
+
+        when(userRepository.save(newUser)).thenReturn(newUser);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(newUser));
 
         UserDTO response = userService.updateUser(user);
 
@@ -171,8 +213,10 @@ public class UserServiceTests {
 
     @Test
     public void testDeleteUser() {
-        User user = getUser();
-        when(userRepository.getById(user.getId())).thenReturn(user);
+        UserDTO user = getUser();
+        User newUser = dataMapper.fromDTO(user);
+
+        when(userRepository.getById(user.getId())).thenReturn(newUser);
         doNothing().when(userRepository).deleteById(user.getId());
 
         userService.deleteUser(user.getId());
