@@ -1,7 +1,8 @@
 package com.example.demo.TaskServiceTests;
 
-import com.example.demo.Utils.DataMapper;
+import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.Task;
+import com.example.demo.models.User;
 import com.example.demo.models.dto.StateDTO;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.repositories.TaskRepository;
@@ -41,9 +42,6 @@ public class TaskServiceTests {
     @InjectMocks
     private TaskService taskService;
 
-    @Mock
-    private DataMapper dataMapper;
-
     private Faker faker = new Faker();
 
     @BeforeEach
@@ -57,21 +55,16 @@ public class TaskServiceTests {
         task.setTitle(faker.lorem().sentence());
         task.setContent(faker.lorem().paragraph());
         task.setState(StateDTO.CREATED);
+        task.setUserId(UUID.randomUUID());
         return task;
     }
 
     @Test
     public void testSaveTask() {
         TaskDTO task = getTask();
-        Task newTask = new Task();
-        newTask.setId(task.getId());
-        newTask.setTitle(task.getTitle());
-        newTask.setContent(task.getContent());
-        newTask.setState(newTask.getState());
+        Task newTask = DataConverter.toTask(task, new User());
 
         when(taskRepository.save(any(Task.class))).thenReturn(newTask);
-        when(dataMapper.TaskFromDTO(any(TaskDTO.class))).thenReturn(newTask);
-        when(dataMapper.TaskToDTO(any(Task.class))).thenReturn(task);
 
         TaskDTO savedTask = taskService.saveTask(task);
 
@@ -85,14 +78,9 @@ public class TaskServiceTests {
     @Test
     public void testGetByIdTask() {
         TaskDTO task = getTask();
-        Task newTask = new Task();
-        newTask.setId(task.getId());
-        newTask.setTitle(task.getTitle());
-        newTask.setContent(task.getContent());
-        newTask.setState(newTask.getState());
+        Task newTask = DataConverter.toTask(task, new User());
 
         when(taskRepository.findById(any(UUID.class))).thenReturn(Optional.of(newTask));
-        when(dataMapper.TaskToDTO(any(Task.class))).thenReturn(task);
 
         TaskDTO foundTask = taskService.getById(task.getId());
 
@@ -106,14 +94,9 @@ public class TaskServiceTests {
     @Test
     public void testGetByTitleTask() {
         TaskDTO task = getTask();
-        Task newTask = new Task();
-        newTask.setId(task.getId());
-        newTask.setTitle(task.getTitle());
-        newTask.setContent(task.getContent());
-        newTask.setState(newTask.getState());
+        Task newTask = DataConverter.toTask(task, new User());
 
         when(taskRepository.findByTitle(task.getTitle())).thenReturn(Optional.of(newTask));
-        when(dataMapper.TaskToDTO(any(Task.class))).thenReturn(task);
 
         TaskDTO foundTask = taskService.getByTitle(task.getTitle());
 
@@ -133,14 +116,10 @@ public class TaskServiceTests {
         }
 
         List<Task> newTaskList = taskList.stream()
-                .map(dataMapper::TaskFromDTO)
+                .map(taskDTO -> DataConverter.toTask(taskDTO, new User()))
                 .collect(Collectors.toList());
 
         when(taskRepository.findAll()).thenReturn(newTaskList);
-        when(dataMapper.TaskToDTO(any(Task.class))).thenAnswer(invocation -> {
-            Task task = invocation.getArgument(0);
-            return taskList.stream().filter(t -> t.getId().equals(task.getId())).findFirst().orElse(null);
-        });
 
         List<TaskDTO> foundTasks = taskService.findAll();
 
@@ -157,7 +136,7 @@ public class TaskServiceTests {
         Pageable pageable = PageRequest.of(0, 100);
         Page<TaskDTO> tasksResult = new PageImpl<>(taskList, pageable, taskList.size());
 
-        Page<Task> taskPageToFind = tasksResult.map(dataMapper::TaskFromDTO);
+        Page<Task> taskPageToFind = tasksResult.map(taskDTO -> DataConverter.toTask(taskDTO, new User()));
 
         when(taskRepository.findAll(pageable)).thenReturn(taskPageToFind);
 
@@ -173,7 +152,7 @@ public class TaskServiceTests {
         task.setTitle("Updated Title");
         task.setContent("Updated Content");
 
-        Task newTask = dataMapper.TaskFromDTO(task);
+        Task newTask = DataConverter.toTask(task, new User());
 
         when(taskRepository.save(newTask)).thenReturn(newTask);
         when(taskRepository.findById(task.getId())).thenReturn(Optional.of(newTask));
@@ -189,7 +168,7 @@ public class TaskServiceTests {
     @Test
     public void testDeleteTask() {
         TaskDTO task = getTask();
-        Task newTask = dataMapper.TaskFromDTO(task);
+        Task newTask = DataConverter.toTask(task, new User());
 
         when(taskRepository.getById(task.getId())).thenReturn(newTask);
         doNothing().when(taskRepository).deleteById(task.getId());

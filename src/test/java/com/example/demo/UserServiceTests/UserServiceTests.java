@@ -1,6 +1,6 @@
 package com.example.demo.UserServiceTests;
 
-import com.example.demo.Utils.DataMapper;
+import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.models.dto.UserDTO;
@@ -41,9 +41,6 @@ public class UserServiceTests {
     @InjectMocks
     private UserService userService;
 
-    @Mock
-    private DataMapper dataMapper;
-
     private Faker faker = new Faker();
 
     @BeforeEach
@@ -76,14 +73,9 @@ public class UserServiceTests {
         task.setUserId(user.getId());
         user.setTasks(taskList);
 
-        User newUser = new User();
-        user.setId(user.getId());
-        user.setUsername(user.getUsername());
-        user.setEmail(user.getEmail());
-        user.setPassword(user.getPassword());
-        
+        User newUser = DataConverter.toUser(user);
+
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(newUser));
-        when(dataMapper.UserToDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getById(user.getId());
 
@@ -98,14 +90,9 @@ public class UserServiceTests {
     public void testGetByUsernameUser() {
         UserDTO user = getUser();
 
-        User newUser = new User();
-        user.setId(user.getId());
-        user.setUsername(user.getUsername());
-        user.setEmail(user.getEmail());
-        user.setPassword(user.getPassword());
+        User newUser = DataConverter.toUser(user);
 
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(newUser));
-        when(dataMapper.UserToDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getByUsername(user.getUsername());
 
@@ -120,13 +107,8 @@ public class UserServiceTests {
     public void testGetByEmailUser() {
         UserDTO user = getUser();
 
-        User newUser = new User();
-        user.setId(user.getId());
-        user.setUsername(user.getUsername());
-        user.setEmail(user.getEmail());
-        user.setPassword(user.getPassword());
+        User newUser = DataConverter.toUser(user);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(newUser));
-        when(dataMapper.UserToDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getByEmail(user.getEmail());
 
@@ -145,12 +127,12 @@ public class UserServiceTests {
             userList.add(getUser());
         }
         List<User> newUserList = userList.stream()
-                        .map(dataMapper::UserFromDTO)
-                                .collect(Collectors.toList());
+                .map(DataConverter::toUser)
+                .collect(Collectors.toList());
 
         when(userRepository.findAll()).thenReturn(newUserList);
 
-        List foundUsers = userService.findAll();
+        List<UserDTO> foundUsers = userService.findAll();
 
         assertNotNull(foundUsers);
         assertEquals(foundUsers.size(), 5);
@@ -165,7 +147,7 @@ public class UserServiceTests {
         Pageable pageable = PageRequest.of(0, 100);
         Page<UserDTO> usersResult = new PageImpl<>(userList, pageable, userList.size());
 
-        Page<User> userPageToFind = usersResult.map(dataMapper::UserFromDTO);
+        Page<User> userPageToFind = usersResult.map(DataConverter::toUser);
 
         when(userRepository.findAll(pageable)).thenReturn(userPageToFind);
 
@@ -196,7 +178,7 @@ public class UserServiceTests {
         user.setEmail("nuevo@gmail.com");
         user.setUsername("newUsername");
 
-        User newUser = dataMapper.UserFromDTO(user);
+        User newUser = DataConverter.toUser(user);
 
         when(userRepository.save(newUser)).thenReturn(newUser);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(newUser));
@@ -212,7 +194,7 @@ public class UserServiceTests {
     @Test
     public void testDeleteUser() {
         UserDTO user = getUser();
-        User newUser = dataMapper.UserFromDTO(user);
+        User newUser = DataConverter.toUser(user);
 
         when(userRepository.getById(user.getId())).thenReturn(newUser);
         doNothing().when(userRepository).deleteById(user.getId());
@@ -222,5 +204,3 @@ public class UserServiceTests {
         verify(userRepository).deleteById(user.getId());
     }
 }
-
-

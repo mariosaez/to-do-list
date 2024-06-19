@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.Utils.CustomExceptions;
-import com.example.demo.Utils.DataMapper;
+import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
@@ -21,57 +21,50 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private DataMapper dataMapper;
 
     @Transactional
     public UserDTO saveUser(UserDTO user) {
-        UserDTO userDTO = dataMapper.UserToDTO(userRepository.save(dataMapper.UserFromDTO(user)));
-        return userDTO;
+        User userToSave = DataConverter.toUser(user);
+        User userSaved = userRepository.save(userToSave);
+        return DataConverter.toUserDTO(userSaved);
     }
 
     @Transactional
     public UserDTO getById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with id: " + id));
-        UserDTO userDTO = dataMapper.UserToDTO(user);
-        return userDTO;
+        return DataConverter.toUserDTO(user);
     }
 
     public UserDTO getByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with username: " + username));
-        UserDTO userDTO = dataMapper.UserToDTO(user);
-        return userDTO;
+        return DataConverter.toUserDTO(user);
     }
 
     public UserDTO getByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with email: " + email));
-        UserDTO userDTO = dataMapper.UserToDTO(user);
-        return userDTO;
+        return DataConverter.toUserDTO(user);
     }
 
     public List<UserDTO> findAll() {
         List<User> userList = userRepository.findAll();
-        List<UserDTO> userDTOList = userList.stream()
-                .map(dataMapper::UserToDTO)
+        return userList.stream()
+                .map(DataConverter::toUserDTO)
                 .collect(Collectors.toList());
-        return userDTOList;
     }
 
     public Page<UserDTO> findAllPaginated(Pageable pageable) {
         Page<User> userPage = userRepository.findAll(pageable);
-        Page<UserDTO> userDTOPage = userPage.map(dataMapper::UserToDTO);
-        return userDTOPage;
+        return userPage.map(DataConverter::toUserDTO);
     }
 
     @Transactional
     public UserDTO updateUser(UserDTO user) {
-        User userToUpdate = dataMapper.UserFromDTO(user);
-        User result = userRepository.save(userToUpdate);
-        UserDTO userDTO = dataMapper.UserToDTO(result);
-        return userDTO;
+        User userToUpdate = DataConverter.toUser(user);
+        User updatedUser = userRepository.save(userToUpdate);
+        return DataConverter.toUserDTO(updatedUser);
     }
 
     @Transactional
@@ -87,7 +80,6 @@ public class UserService {
     public UserDTO deleteUser(UUID id) {
         User userToDelete = userRepository.getById(id);
         userRepository.deleteById(userToDelete.getId());
-        UserDTO userDTO = dataMapper.UserToDTO(userToDelete);
-        return userDTO;
+        return DataConverter.toUserDTO(userToDelete);
     }
 }
