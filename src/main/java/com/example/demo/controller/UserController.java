@@ -25,37 +25,37 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping("/registerUser")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO user) {
         UserDTO savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
-    @GetMapping("/getById/{id}")
+    @GetMapping("/getUserById/{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable UUID id) {
         UserDTO getUser = userService.getById(id);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
     }
 
-    @GetMapping("/getByUsername/{username}")
+    @GetMapping("/getUserByUsername/{username}")
     public ResponseEntity<UserDTO> getByusername(@PathVariable String username) {
         UserDTO getUser = userService.getByUsername(username);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
     }
 
-    @GetMapping("/getByEmail/{email}")
+    @GetMapping("/getUserByEmail/{email}")
     public ResponseEntity<UserDTO> getByEmail(@PathVariable String email) {
         UserDTO getUser = userService.getByEmail(email);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/getAllUsers")
     public ResponseEntity<List<UserDTO>> getAll() {
         List users = userService.findAll();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/getAllPaginated")
+    @GetMapping("/getAllUsersPaginated")
     public ResponseEntity<PagedResponse<UserDTO>> getAllPaginated(
             @RequestParam() int page,
             @RequestParam() int size

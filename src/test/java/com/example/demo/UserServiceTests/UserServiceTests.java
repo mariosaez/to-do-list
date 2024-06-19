@@ -1,7 +1,6 @@
 package com.example.demo.UserServiceTests;
 
 import com.example.demo.Utils.DataMapper;
-import com.example.demo.models.Task;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.models.dto.UserDTO;
@@ -15,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -85,7 +83,7 @@ public class UserServiceTests {
         user.setPassword(user.getPassword());
         
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(newUser));
-        when(dataMapper.toDTO(any(User.class))).thenReturn(user);
+        when(dataMapper.UserToDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getById(user.getId());
 
@@ -107,7 +105,7 @@ public class UserServiceTests {
         user.setPassword(user.getPassword());
 
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(newUser));
-        when(dataMapper.toDTO(any(User.class))).thenReturn(user);
+        when(dataMapper.UserToDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getByUsername(user.getUsername());
 
@@ -128,7 +126,7 @@ public class UserServiceTests {
         user.setEmail(user.getEmail());
         user.setPassword(user.getPassword());
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(newUser));
-        when(dataMapper.toDTO(any(User.class))).thenReturn(user);
+        when(dataMapper.UserToDTO(any(User.class))).thenReturn(user);
 
         UserDTO foundUser = userService.getByEmail(user.getEmail());
 
@@ -147,7 +145,7 @@ public class UserServiceTests {
             userList.add(getUser());
         }
         List<User> newUserList = userList.stream()
-                        .map(dataMapper::fromDTO)
+                        .map(dataMapper::UserFromDTO)
                                 .collect(Collectors.toList());
 
         when(userRepository.findAll()).thenReturn(newUserList);
@@ -167,7 +165,7 @@ public class UserServiceTests {
         Pageable pageable = PageRequest.of(0, 100);
         Page<UserDTO> usersResult = new PageImpl<>(userList, pageable, userList.size());
 
-        Page<User> userPageToFind = usersResult.map(dataMapper::fromDTO);
+        Page<User> userPageToFind = usersResult.map(dataMapper::UserFromDTO);
 
         when(userRepository.findAll(pageable)).thenReturn(userPageToFind);
 
@@ -198,7 +196,7 @@ public class UserServiceTests {
         user.setEmail("nuevo@gmail.com");
         user.setUsername("newUsername");
 
-        User newUser = dataMapper.fromDTO(user);
+        User newUser = dataMapper.UserFromDTO(user);
 
         when(userRepository.save(newUser)).thenReturn(newUser);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(newUser));
@@ -214,7 +212,7 @@ public class UserServiceTests {
     @Test
     public void testDeleteUser() {
         UserDTO user = getUser();
-        User newUser = dataMapper.fromDTO(user);
+        User newUser = dataMapper.UserFromDTO(user);
 
         when(userRepository.getById(user.getId())).thenReturn(newUser);
         doNothing().when(userRepository).deleteById(user.getId());
