@@ -1,6 +1,7 @@
 package com.example.demo.UserServiceTests;
 
 import com.example.demo.Utils.CustomExceptions;
+import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,6 +42,7 @@ public class UserServiceExceptionTests {
         user.setPassword(faker.internet().password());
         user.setId(UUID.randomUUID());
         user.setEmail(faker.internet().emailAddress());
+        user.setTasks(new ArrayList<>());
         return user;
     }
 
@@ -72,7 +75,7 @@ public class UserServiceExceptionTests {
 
     @Test
     public void testUpdateUserNotFound() {
-        UserDTO user = new UserDTO();
+        UserDTO user = DataConverter.toUserDTO(getUser());
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
         assertThrows(CustomExceptions.UserNotFoundException.class, () -> {
             userService.updateUser(user);

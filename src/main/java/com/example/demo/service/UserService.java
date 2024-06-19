@@ -63,6 +63,7 @@ public class UserService {
     @Transactional
     public UserDTO updateUser(UserDTO user) {
         User userToUpdate = DataConverter.toUser(user);
+        getById(userToUpdate.getId());
         User updatedUser = userRepository.save(userToUpdate);
         return DataConverter.toUserDTO(updatedUser);
     }

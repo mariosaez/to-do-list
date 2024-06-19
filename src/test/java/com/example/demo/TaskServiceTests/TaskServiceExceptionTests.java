@@ -1,9 +1,11 @@
 package com.example.demo.TaskServiceTests;
 
 import com.example.demo.Utils.CustomExceptions;
+import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.State;
 import com.example.demo.models.Task;
 import com.example.demo.models.dto.TaskDTO;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.TaskRepository;
 import com.example.demo.service.TaskService;
 import com.github.javafaker.Faker;
@@ -13,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,8 +44,19 @@ public class TaskServiceExceptionTests {
         task.setTitle(faker.lorem().sentence());
         task.setContent(faker.lorem().paragraph());
         task.setState(State.CREATED);
+        task.setUser(DataConverter.toUser(getUser()));
         return task;
     }
+    private UserDTO getUser() {
+        UserDTO user = new UserDTO();
+        user.setUsername(faker.name().username());
+        user.setPassword(faker.internet().password());
+        user.setId(UUID.randomUUID());
+        user.setEmail(faker.internet().emailAddress());
+        user.setTasks(new ArrayList<>());
+        return user;
+    }
+
 
     @Test
     public void testGetByIdTaskNotFound() {
@@ -64,7 +78,7 @@ public class TaskServiceExceptionTests {
 
     @Test
     public void testUpdateTaskNotFound() {
-        TaskDTO taskDTO = new TaskDTO();
+        TaskDTO taskDTO = DataConverter.toTaskDTO(getTask());
         when(taskRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
         assertThrows(CustomExceptions.UserNotFoundException.class, () -> {
             taskService.updateTask(taskDTO);

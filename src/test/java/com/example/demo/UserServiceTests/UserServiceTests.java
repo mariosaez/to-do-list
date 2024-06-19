@@ -2,6 +2,7 @@ package com.example.demo.UserServiceTests;
 
 import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.StateDTO;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.UserRepository;
@@ -54,6 +55,7 @@ public class UserServiceTests {
         user.setPassword(faker.internet().password());
         user.setId(UUID.randomUUID());
         user.setEmail(faker.internet().emailAddress());
+        user.setTasks(new ArrayList<>());
         return user;
     }
 
@@ -61,6 +63,7 @@ public class UserServiceTests {
         TaskDTO task = new TaskDTO();
         task.setId(UUID.randomUUID());
         task.setTitle("task 1");
+        task.setState(StateDTO.CREATED);
         return task;
     }
 
