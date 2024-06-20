@@ -81,6 +81,23 @@ class UserControllerIntegrationTests {
 	}
 
 	@Test
+	public void testLoginUser() {
+		UserDTO user = getUser();
+		Mockito.when(userService.login(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
+
+		String url = String.format("/api/users/login?username=%s&password=%s", user.getUsername(), user.getPassword());
+
+		ResponseEntity<UserDTO> response = restTemplate.getForEntity(url, UserDTO.class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().getUsername()).isEqualTo(user.getUsername());
+		assertThat(response.getBody().getEmail()).isEqualTo(user.getEmail());
+		assertThat(response.getBody().getPassword()).isEqualTo(user.getPassword());
+		assertThat(response.getBody().getId()).isEqualTo(user.getId());
+	}
+
+	@Test
 	public void testGetByIdUser() {
 		UserDTO user = getUser();
 		Mockito.when(userService.getById(Mockito.any(UUID.class))).thenReturn(user);

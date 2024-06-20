@@ -31,6 +31,15 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<UserDTO> login (
+                    @RequestParam() String username,
+                    @RequestParam() String password
+            ) {
+        UserDTO foundUser = userService.login(username, password);
+        return new ResponseEntity<>(foundUser, HttpStatus.OK);
+    }
+
     @GetMapping("/getUserById/{id}")
     public ResponseEntity<UserDTO> getById(@PathVariable UUID id) {
         UserDTO getUser = userService.getById(id);

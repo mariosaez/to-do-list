@@ -56,6 +56,15 @@ public class UserServiceExceptionTests {
     }
 
     @Test
+    public void testLoginUserNotFound() {
+        when(userRepository.findByUsernameAndPassword(any(),any())).thenReturn(Optional.empty());
+
+        assertThrows(CustomExceptions.UserNotFoundException.class, () -> {
+            userService.login("", "");
+        });
+    }
+
+    @Test
     public void testGetByUsernameUserNotFound() {
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
 
