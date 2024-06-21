@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.config.PagedResponse;
 import com.example.demo.models.User;
+import com.example.demo.models.dto.LoginRequestDTO;
 import com.example.demo.models.dto.UserDTO;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -32,11 +33,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login (
-                    @RequestParam() String username,
-                    @RequestParam() String password
-            ) {
-        UserDTO foundUser = userService.login(username, password);
+    public ResponseEntity<UserDTO> login (@RequestBody LoginRequestDTO loginRequest) {
+        UserDTO foundUser = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
         return new ResponseEntity<>(foundUser, HttpStatus.OK);
     }
 
