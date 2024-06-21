@@ -87,7 +87,7 @@ class UserControllerIntegrationTests {
 
 		String url = String.format("/api/users/login?username=%s&password=%s", user.getUsername(), user.getPassword());
 
-		ResponseEntity<UserDTO> response = restTemplate.getForEntity(url, UserDTO.class);
+		ResponseEntity<UserDTO> response = restTemplate.postForEntity(url, user, UserDTO.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(response.getBody()).isNotNull();

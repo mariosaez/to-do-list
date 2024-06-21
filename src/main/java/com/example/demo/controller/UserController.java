@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<UserDTO> login (
                     @RequestParam() String username,
                     @RequestParam() String password
