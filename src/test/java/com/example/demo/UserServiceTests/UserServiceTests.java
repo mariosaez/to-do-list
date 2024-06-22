@@ -90,6 +90,24 @@ public class UserServiceTests {
     }
 
     @Test
+    public void testLoginUser() {
+        UserDTO user = getUser();
+        user.setTasks(new ArrayList<>());
+
+        User newUser = DataConverter.toUser(user);
+
+        when(userRepository.findByUsernameAndPassword(any(), any())).thenReturn(Optional.of(newUser));
+
+        UserDTO foundUser = userService.login(newUser.getUsername(), newUser.getPassword());
+
+        assertNotNull(foundUser);
+        assertEquals(user.getId(), foundUser.getId());
+        assertEquals(user.getUsername(), foundUser.getUsername());
+        assertEquals(user.getEmail(), foundUser.getEmail());
+        assertEquals(user.getPassword(), foundUser.getPassword());
+    }
+
+    @Test
     public void testGetByUsernameUser() {
         UserDTO user = getUser();
 

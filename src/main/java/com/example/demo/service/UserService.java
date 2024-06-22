@@ -29,6 +29,12 @@ public class UserService {
         return DataConverter.toUserDTO(userSaved);
     }
 
+    public UserDTO login(String username, String password) {
+        User userFound = userRepository.findByUsernameAndPassword(username, password)
+                .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found"));
+        return DataConverter.toUserDTO(userFound);
+    }
+
     @Transactional
     public UserDTO getById(UUID id) {
         User user = userRepository.findById(id)
