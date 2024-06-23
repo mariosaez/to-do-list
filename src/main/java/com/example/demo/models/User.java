@@ -14,7 +14,7 @@ public class User extends DomainObject {
 
     @Id
     @Column(name = "id", nullable = false)
-    private UUID id = UUID.randomUUID();
+    private UUID id;
 
     @Column(nullable = false, unique = true)
     private String username;

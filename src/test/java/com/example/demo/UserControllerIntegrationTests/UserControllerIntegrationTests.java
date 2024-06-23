@@ -4,6 +4,7 @@ package com.example.demo.UserControllerIntegrationTests;
 import com.example.demo.config.PagedResponse;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.UserDTO;
+import com.example.demo.models.dto.UserRegisterDTO;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
@@ -68,7 +69,7 @@ class UserControllerIntegrationTests {
 	@Test
 	public void testRegisterUser() {
 		UserDTO user = getUser();
-		Mockito.when(userService.saveUser(Mockito.any(UserDTO.class))).thenReturn(user);
+		Mockito.when(userService.saveUser(Mockito.any(UserRegisterDTO.class))).thenReturn(user);
 
 		ResponseEntity<User> response = restTemplate.postForEntity("/api/users/register", user, User.class);
 

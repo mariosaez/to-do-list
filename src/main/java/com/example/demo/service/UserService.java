@@ -4,6 +4,7 @@ import com.example.demo.Utils.CustomExceptions;
 import com.example.demo.Utils.DataConverter;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.UserDTO;
+import com.example.demo.models.dto.UserRegisterDTO;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,8 +24,8 @@ public class UserService {
     private UserRepository userRepository;
 
     @Transactional
-    public UserDTO saveUser(UserDTO user) {
-        User userToSave = DataConverter.toUser(user);
+    public UserDTO saveUser(UserRegisterDTO user) {
+        User userToSave = DataConverter.userRegisterToUser(user);
         User userSaved = userRepository.save(userToSave);
         return DataConverter.toUserDTO(userSaved);
     }

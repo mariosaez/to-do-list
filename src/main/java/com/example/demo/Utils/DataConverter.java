@@ -6,11 +6,26 @@ import com.example.demo.models.User;
 import com.example.demo.models.dto.StateDTO;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.models.dto.UserDTO;
+import com.example.demo.models.dto.UserRegisterDTO;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public interface DataConverter {
+
+    public static User userRegisterToUser(UserRegisterDTO userToRegister) {
+        User user = new User();
+        user.setId(userToRegister.getId());
+        user.setUsername(userToRegister.getUsername());
+        user.setPassword(userToRegister.getPassword());
+        user.setEmail(userToRegister.getEmail());
+        user.setName(userToRegister.getName());
+        user.setSurname(userToRegister.getSurname());
+        user.setTasks(new ArrayList<>());
+        return user;
+    }
 
     public static UserDTO toUserDTO(User user) {
         UserDTO userDTO = new UserDTO();

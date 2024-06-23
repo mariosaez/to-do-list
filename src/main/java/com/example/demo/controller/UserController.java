@@ -4,6 +4,7 @@ import com.example.demo.config.PagedResponse;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.LoginRequestDTO;
 import com.example.demo.models.dto.UserDTO;
+import com.example.demo.models.dto.UserRegisterDTO;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.hibernate.annotations.Parameter;
@@ -27,7 +28,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/registerUser")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserRegisterDTO user) {
         UserDTO savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }

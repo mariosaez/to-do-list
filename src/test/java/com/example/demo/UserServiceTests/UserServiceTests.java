@@ -5,6 +5,7 @@ import com.example.demo.models.User;
 import com.example.demo.models.dto.StateDTO;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.models.dto.UserDTO;
+import com.example.demo.models.dto.UserRegisterDTO;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.service.UserService;
 import com.github.javafaker.Faker;
@@ -59,12 +60,40 @@ public class UserServiceTests {
         return user;
     }
 
+    private UserRegisterDTO getRegisterUser() {
+        UserRegisterDTO user = new UserRegisterDTO();
+        user.setUsername(faker.name().username());
+        user.setPassword(faker.internet().password());
+        user.setEmail(faker.internet().emailAddress());
+        user.setName(faker.name().name());
+        user.setSurname(faker.name().lastName());
+        return user;
+    }
+
     private TaskDTO getTask() {
         TaskDTO task = new TaskDTO();
         task.setId(UUID.randomUUID());
         task.setTitle("task 1");
         task.setState(StateDTO.CREATED);
         return task;
+    }
+
+    @Test
+    public void registerUser() {
+        UserRegisterDTO userRegisterDTO = getRegisterUser();
+
+        User newUser = DataConverter.userRegisterToUser(userRegisterDTO);
+
+        when(userRepository.save(newUser)).thenReturn(newUser);
+
+        UserDTO createdUser = userService.saveUser(userRegisterDTO);
+
+        assertNotNull(createdUser);
+        assertEquals(userRegisterDTO.getUsername(), createdUser.getUsername());
+        assertEquals(userRegisterDTO.getEmail(), createdUser.getEmail());
+        assertEquals(userRegisterDTO.getPassword(), createdUser.getPassword());
+        assertEquals(userRegisterDTO.getName(), createdUser.getName());
+        assertEquals(userRegisterDTO.getSurname(), createdUser.getSurname());
     }
 
     @Test

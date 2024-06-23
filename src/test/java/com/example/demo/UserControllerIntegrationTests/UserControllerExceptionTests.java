@@ -3,6 +3,7 @@ package com.example.demo.UserControllerIntegrationTests;
 import com.example.demo.Utils.CustomExceptions;
 import com.example.demo.Utils.GlobalExceptionHandler;
 import com.example.demo.models.dto.UserDTO;
+import com.example.demo.models.dto.UserRegisterDTO;
 import com.example.demo.service.UserService;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ public class UserControllerExceptionTests {
 
     private UserDTO createUser() {
         UserDTO user = getUser();
-        Mockito.when(userService.saveUser(Mockito.any(UserDTO.class))).thenReturn(user);
+        Mockito.when(userService.saveUser(Mockito.any(UserRegisterDTO.class))).thenReturn(user);
         return user;
     }
 
