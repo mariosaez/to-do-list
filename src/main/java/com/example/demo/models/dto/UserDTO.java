@@ -2,6 +2,7 @@ package com.example.demo.models.dto;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public class UserDTO {
     private String email;
     private String name;
     private String surname;
-    private List<TaskDTO> tasks;
+    private List<TaskDTO> tasks = new ArrayList<>();
 }
 
 
