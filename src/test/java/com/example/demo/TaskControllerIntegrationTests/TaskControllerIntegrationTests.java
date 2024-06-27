@@ -126,6 +126,25 @@ public class TaskControllerIntegrationTests {
     }
 
     @Test
+    public void testGetTasksByUser() {
+        List<TaskDTO> taskList = new ArrayList<>();
+
+        UUID id = UUID.randomUUID();
+
+        for (int i = 0; i < 5; i++) {
+            taskList.add(getTask());
+        }
+        Mockito.when(taskService.getTasksByUserId(any())).thenReturn(taskList);
+
+        String url = String.format("/api/tasks/getTasksByUser/%s", id);
+        ResponseEntity<List> response = restTemplate.getForEntity(url, List.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(5);
+    }
+
+    @Test
     public void testGetAllTasksPaginated() {
         Pageable pageable = PageRequest.of(0, 100);
         List<TaskDTO> taskList = new ArrayList<>();

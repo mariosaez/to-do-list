@@ -5,6 +5,7 @@ import com.example.demo.models.Task;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.StateDTO;
 import com.example.demo.models.dto.TaskDTO;
+import com.example.demo.models.dto.UserDTO;
 import com.example.demo.repositories.TaskRepository;
 import com.example.demo.service.TaskService;
 import com.github.javafaker.Faker;
@@ -59,6 +60,16 @@ public class TaskServiceTests {
         return task;
     }
 
+    private UserDTO getUser() {
+        UserDTO user = new UserDTO();
+        user.setUsername(faker.name().username());
+        user.setPassword(faker.internet().password());
+        user.setId(UUID.randomUUID());
+        user.setEmail(faker.internet().emailAddress());
+        user.setTasks(new ArrayList<>());
+        return user;
+    }
+
     @Test
     public void testSaveTask() {
         TaskDTO task = getTask();
@@ -73,6 +84,29 @@ public class TaskServiceTests {
         assertEquals(task.getTitle(), savedTask.getTitle());
         assertEquals(task.getContent(), savedTask.getContent());
         assertEquals(task.getState(), savedTask.getState());
+    }
+
+    @Test
+    public void testGetTasksByUserId() {
+        List<TaskDTO> taskList = new ArrayList<>();
+
+        User user = DataConverter.toUser(getUser());
+
+        for (int i = 0; i < 5; i++) {
+            taskList.add(getTask());
+        }
+
+        List<Task> newTaskList = taskList.stream()
+                .map(taskDTO -> DataConverter.toTask(taskDTO, user))
+                .collect(Collectors.toList());
+
+        when(taskRepository.findByUserId(any(UUID.class))).thenReturn(newTaskList);
+
+        List<TaskDTO> foundTasks = taskService.getTasksByUserId(user.getId());
+
+        assertNotNull(foundTasks);
+        assertEquals(foundTasks.size(), 5);
+
     }
 
     @Test
