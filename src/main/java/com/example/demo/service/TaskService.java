@@ -43,6 +43,14 @@ public class TaskService {
         return DataConverter.toTaskDTO(task);
     }
 
+    @Transactional
+    public List<TaskDTO> getTasksByUserId(UUID id) {
+        List<Task> taskList = taskRepository.findByUserId(id);
+        return taskList.stream()
+                .map(DataConverter::toTaskDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<TaskDTO> findAll() {
         List<Task> taskList = taskRepository.findAll();
         return taskList.stream()

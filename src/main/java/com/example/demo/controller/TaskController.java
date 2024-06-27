@@ -33,6 +33,12 @@ public class TaskController {
         return new ResponseEntity<>(getTask, HttpStatus.OK);
     }
 
+    @GetMapping("/getTasksByUser/{id}")
+    public ResponseEntity<List<TaskDTO>> getTaskByUserId(@PathVariable UUID id) {
+        List tasks = taskService.getTasksByUserId(id);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    }
+
     @GetMapping("/getTaskByTitle/{title}")
     public ResponseEntity<TaskDTO> getByTitle(@PathVariable String title) {
         TaskDTO getTask = taskService.getByTitle(title);
