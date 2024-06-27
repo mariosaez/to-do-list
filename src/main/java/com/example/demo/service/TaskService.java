@@ -27,7 +27,7 @@ public class TaskService {
 
     @Transactional
     public TaskDTO saveTask(TaskDTO task) {
-        User user = userRepository.getById(task.getId());
+        User user = userRepository.getById(task.getUserId());
         Task taskToSave = DataConverter.toTask(task, user);
         Task savedTask = taskRepository.save(taskToSave);
         return DataConverter.toTaskDTO(savedTask);
