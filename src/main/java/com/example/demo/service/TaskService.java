@@ -6,6 +6,7 @@ import com.example.demo.models.Task;
 import com.example.demo.models.User;
 import com.example.demo.models.dto.TaskDTO;
 import com.example.demo.repositories.TaskRepository;
+import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,10 +22,13 @@ public class TaskService {
 
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional
     public TaskDTO saveTask(TaskDTO task) {
-        Task taskToSave = DataConverter.toTask(task, null);
+        User user = userRepository.getById(task.getId());
+        Task taskToSave = DataConverter.toTask(task, user);
         Task savedTask = taskRepository.save(taskToSave);
         return DataConverter.toTaskDTO(savedTask);
     }
