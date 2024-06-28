@@ -70,7 +70,9 @@ public class UserService {
     @Transactional
     public UserDTO updateUser(UserDTO user) {
         User userToUpdate = DataConverter.toUser(user);
-        getById(userToUpdate.getId());
+        User userFound = userRepository.findById(user.getId())
+                .orElseThrow(() -> new CustomExceptions.UserNotFoundException("User not found with id: " + user.getId()));
+        userToUpdate.setTasks(userFound.getTasks());
         User updatedUser = userRepository.save(userToUpdate);
         return DataConverter.toUserDTO(updatedUser);
     }
