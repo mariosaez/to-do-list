@@ -69,7 +69,7 @@ public class TaskService {
 
     @Transactional
     public TaskDTO updateTask(TaskDTO task) {
-        Task taskToUpdate = DataConverter.toTask(task, null); // Suponiendo que el usuario se establece después
+        Task taskToUpdate = DataConverter.toTask(task, null);
         Task updatedTask = taskRepository.save(taskToUpdate);
         return DataConverter.toTaskDTO(updatedTask);
     }
