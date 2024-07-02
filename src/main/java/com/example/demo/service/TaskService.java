@@ -23,11 +23,11 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Transactional
     public TaskDTO saveTask(TaskDTO task) {
-        User user = userRepository.getById(task.getUserId());
+        User user = DataConverter.toUser(userService.getById(task.getUserId()));
         Task taskToSave = DataConverter.toTask(task, user);
         Task savedTask = taskRepository.save(taskToSave);
         return DataConverter.toTaskDTO(savedTask);
@@ -69,7 +69,8 @@ public class TaskService {
 
     @Transactional
     public TaskDTO updateTask(TaskDTO task) {
-        Task taskToUpdate = DataConverter.toTask(task, null);
+        User user = DataConverter.toUser(userService.getById(task.getUserId()));
+        Task taskToUpdate = DataConverter.toTask(task, user);
         Task updatedTask = taskRepository.save(taskToUpdate);
         return DataConverter.toTaskDTO(updatedTask);
     }
